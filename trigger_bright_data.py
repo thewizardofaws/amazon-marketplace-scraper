@@ -28,14 +28,15 @@ def trigger_bright_data_collector(keyword="laptop"):
         "Content-Type": "application/json"
     }
     
-    # Payload with keyword
+    # Change the payload to include the 'url' field
+    amazon_url = f"https://www.amazon.com/s?k={keyword}"
     payload = {
-        "keyword": keyword
+        "url": amazon_url
     }
     
     try:
         print("Step 1: Authenticating with Bright Data Cloud...")
-        print(f"Search Keyword: {keyword}")
+        print(f"Target URL: {amazon_url}")
         print("-" * 60)
         
         # Send POST request
@@ -46,8 +47,11 @@ def trigger_bright_data_collector(keyword="laptop"):
         if response.status_code == 200:
             response_data = response.json()
             
-            # Extract response_id
-            response_id = response_data.get("response_id") or response_data.get("id") or response_data.get("job_id")
+            # Extract response_id (try multiple possible field names)
+            response_id = (response_data.get("response_id") or 
+                          response_data.get("collection_id") or 
+                          response_data.get("id") or 
+                          response_data.get("job_id"))
             
             if not response_id:
                 print("Error: No response_id found in API response")
